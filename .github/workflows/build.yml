@@ -22,6 +22,7 @@ jobs:
       - uses: docker/build-push-action@v4
         with:
           push: false
+          file: Dockerfile.polkadot
           tags: ${{secrets.DOCKERHUB_USERNAME}}/polkadot-cli:${{ github.sha }}
 
       - uses: kitabisa/docker-slim-action@v1
