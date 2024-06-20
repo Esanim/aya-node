@@ -1,0 +1,3 @@
+FROM node:20-alpine AS node
+
+RUN npm install -g @polkadot/api-cli
