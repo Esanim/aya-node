@@ -48,5 +48,5 @@ jobs:
 
         # Push to the registry
       - run: |
-          docker tag IMAGE_NAME:slim-{{github.run_number}} ${{ secrets.DOCKERHUB_USERNAME }}/IMAGE_NAME:slim-{{github.run_number}}
-          docker push ${{ secrets.DOCKERHUB_USERNAME }}/IMAGE_NAME:slim-{{github.run_number}}
+          docker tag europe-docker.pkg.dev/aya-test/aya:slim-{{ github.sha }} ${{ secrets.DOCKERHUB_USERNAME }}/europe-docker.pkg.dev/aya-test/aya:slim-{{ github.sha }}
+          docker push ${{ secrets.DOCKERHUB_USERNAME }}/europe-docker.pkg.dev/aya-test/aya:slim-{{ github.sha }}
