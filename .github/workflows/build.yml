@@ -4,6 +4,7 @@ on:
   push:
     branches:
       - 'main'
+      - 'aya-test'
 
 jobs:
   docker-build-push:
