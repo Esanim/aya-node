@@ -26,7 +26,7 @@ RUN apk update && \
     apk add libstdc++
 
 COPY --from=builder aya/target/release/aya-node /target/release/aya-node
-COPY --from-builder aya/chainspec.json /chainspec.json
+COPY --from=builder aya/chainspec.json .
 
 # 30333 for p2p traffic
 # 9933 for RPC call
