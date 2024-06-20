@@ -10,10 +10,12 @@ RUN apt-get update -y && \
 # Install rust wasm. Needed for substrate wasm engine
 RUN rustup component add rust-src --toolchain nightly-x86_64-unknown-linux-gnu
 RUN rustup target add wasm32-unknown-unknown --toolchain nightly-x86_64-unknown-linux-gnu
-RUN wget -O chainspec.json https://github.com/worldmobilegroup/aya-node/releases/download/${VERSION}/wm-devnet-chainspec.json
 # Download aya-node repo
 RUN git clone https://github.com/worldmobilegroup/aya-node /aya
 RUN cd /aya && git submodule init && git submodule update
+
+# Download chain info into /aya folder
+RUN wget -O chainspec.json https://github.com/worldmobilegroup/aya-node/releases/download/${VERSION}/wm-devnet-chainspec.json
 
 RUN cargo build "--$PROFILE"
 
