@@ -1,25 +1,32 @@
-# Note: This is currently designed to simplify development
-# To get a smaller docker image, there should be 2 images generated, in 2 stages.
-
-FROM rustlang/rust:nightly
-
+FROM rustlang/rust:nightly as builder
 
 ARG PROFILE=release
+ARG VERSION=devnet-v.0.3.0
 WORKDIR /aya
 
-# Upcd dates core parts
 RUN apt-get update -y && \
-	apt-get install -y cmake pkg-config libssl-dev git gcc build-essential clang libclang-dev protobuf-compiler
+        apt-get install -y cmake pkg-config libssl-dev git gcc build-essential clang libclang-dev protobuf-compiler
 
 # Install rust wasm. Needed for substrate wasm engine
-RUN rustup target add wasm32-unknown-unknown
-
-# Download Frontier repo
+RUN rustup component add rust-src --toolchain nightly-x86_64-unknown-linux-gnu
+RUN rustup target add wasm32-unknown-unknown --toolchain nightly-x86_64-unknown-linux-gnu
+RUN wget -O chainspec.json https://github.com/worldmobilegroup/aya-node/releases/download/${VERSION}/wm-devnet-chainspec.json
+# Download aya-node repo
 RUN git clone https://github.com/worldmobilegroup/aya-node /aya
 RUN cd /aya && git submodule init && git submodule update
 
-# Download rust dependencies and build the rust binary
 RUN cargo build "--$PROFILE"
+
+# (Optional) Remove debug symbols
+RUN strip ./target/release/aya-node
+
+FROM cgr.dev/chainguard/wolfi-base
+
+RUN apk update && \
+    apk add libstdc++
+
+COPY --from=builder aya/target/release/aya-node /target/release/aya-node
+COPY --from-builder aya/chainspec.json /chainspec.json
 
 # 30333 for p2p traffic
 # 9933 for RPC call
@@ -27,10 +34,5 @@ RUN cargo build "--$PROFILE"
 # 9615 for Prometheus (metrics)
 EXPOSE 30333 9933 9944 9615
 
-
 ENV PROFILE ${PROFILE}
-
-# The execution will re-compile the project to run it
-# This allows to modify the code and not have to re-compile the
-# dependencies.
-CMD cargo run --bin aya-node "--$PROFILE" -- --dev
+CMD ["target/release/aya-node"]
