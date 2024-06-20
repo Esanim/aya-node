@@ -19,24 +19,28 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v3
 
+      # Build the Docker image first
       - uses: docker/build-push-action@v4
         with:
           push: false
           file: ./Dockerfile.polkadot
-          tags: ${{secrets.DOCKERHUB_USERNAME}}/polkadot-cli:${{ github.sha }}
+          tags: IMAGE_NAME:{{github.run_number}}
 
+      # Slim the Image
       - uses: kitabisa/docker-slim-action@v1
         env:
           DSLIM_HTTP_PROBE: false
         with:
-          target: ${{secrets.DOCKERHUB_USERNAME}}/polkadot-cli:${{ github.sha }}
-          tag: ${{secrets.DOCKERHUB_USERNAME}}/polkadot-cli:${{ github.sha }}
+          target: IMAGE_NAME:{{github.run_number}}
+          tag: 'slim-{{github.run_number}}'
 
+      # Docker Hub Login
       - uses: docker/login-action@v2
         with:
           username: ${{ secrets.DOCKERHUB_USERNAME }}
           password: ${{ secrets.DOCKERHUB_TOKEN }}
 
+      # Push to the registry
       - run: |
-          docker tag ${{secrets.DOCKERHUB_USERNAME}}/polkadot-cli:${{ github.sha }} ${{ secrets.DOCKERHUB_USERNAME }}/polkadot-cli:slim-{{ github.sha }}
-          docker push ${{ secrets.DOCKERHUB_USERNAME }}/polkadot-cli:slim-{{ github.sha }}
+          docker tag IMAGE_NAME:slim-{{github.run_number}} ${{ secrets.DOCKERHUB_USERNAME }}/IMAGE_NAME:slim-{{github.run_number}}
+          docker push ${{ secrets.DOCKERHUB_USERNAME }}/IMAGE_NAME:slim-{{github.run_number}}
