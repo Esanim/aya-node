@@ -24,14 +24,14 @@ jobs:
         with:
           push: false
           file: ./Dockerfile.polkadot
-          tags: ${{ github.repository }}:latest
+          tags: polkadot-cli:latest
 
       # Slim it!
       - uses: kitabisa/docker-slim-action@v1
         env:
           DSLIM_HTTP_PROBE: false
         with:
-          target: ${{ github.repository }}:latest
+          target: polkadot-cli:latest
           tag: 'slim'
 
       # Docker Hub Login
@@ -42,5 +42,5 @@ jobs:
 
       # Push to the registry
       - run: |
-          docker tag ${{ github.repository }}:slim ${{ secrets.DOCKERHUB_USERNAME }}/${{ github.repository }}:slim
-          docker push ${{ secrets.DOCKERHUB_USERNAME }}/${{ github.repository }}:slim
+          docker tag polkadot-cli:slim ${{ secrets.DOCKERHUB_USERNAME }}/polkadot-cli:slim
+          docker push ${{ secrets.DOCKERHUB_USERNAME }}/polkadot-cli:slim
