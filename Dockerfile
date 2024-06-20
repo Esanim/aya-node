@@ -1,7 +1,7 @@
 FROM rustlang/rust:nightly as builder
 
 ARG PROFILE=release
-ARG VERSION=devnet-v.0.3.0
+ARG VERSION=devnet-v.0.2.0
 WORKDIR /aya
 
 RUN apt-get update -y && \
