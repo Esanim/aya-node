@@ -19,34 +19,23 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v3
 
-      #   - name: Build an image
-      #     id: docker_meta
-      #     uses: docker/build-push-action@v4
-      #     with:
-      #       platforms: linux/amd64
-      #       push: false
-      #       tags: |
-      #         europe-docker.pkg.dev/aya-test/aya:${{ github.sha }}
       - uses: docker/build-push-action@v4
         with:
           push: false
-          tags: europe-docker.pkg.dev/aya-test/aya:${{ github.sha }}
+          tags: ${{secrets.DOCKERHUB_USERNAME}}/polkadot-cli:${{ github.sha }}
 
-        # Slim the Image
       - uses: kitabisa/docker-slim-action@v1
         env:
           DSLIM_HTTP_PROBE: false
         with:
-          target: europe-docker.pkg.dev/aya-test/aya:${{ github.sha }}
-          tag: 'europe-docker.pkg.dev/aya-test/aya:${{ github.sha }}'
+          target: ${{secrets.DOCKERHUB_USERNAME}}/polkadot-cli:${{ github.sha }}
+          tag: ${{secrets.DOCKERHUB_USERNAME}}/polkadot-cli:${{ github.sha }}
 
-        # Docker Hub Login
       - uses: docker/login-action@v2
         with:
           username: ${{ secrets.DOCKERHUB_USERNAME }}
           password: ${{ secrets.DOCKERHUB_TOKEN }}
 
-        # Push to the registry
       - run: |
-          docker tag europe-docker.pkg.dev/aya-test/aya:slim-{{ github.sha }} ${{ secrets.DOCKERHUB_USERNAME }}/europe-docker.pkg.dev/aya-test/aya:slim-{{ github.sha }}
-          docker push ${{ secrets.DOCKERHUB_USERNAME }}/europe-docker.pkg.dev/aya-test/aya:slim-{{ github.sha }}
+          docker tag ${{secrets.DOCKERHUB_USERNAME}}/polkadot-cli:${{ github.sha }} ${{ secrets.DOCKERHUB_USERNAME }}/polkadot-cli:slim-{{ github.sha }}
+          docker push ${{ secrets.DOCKERHUB_USERNAME }}/polkadot-cli:slim-{{ github.sha }}
